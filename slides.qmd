@@ -1,0 +1,25 @@
+---
+title: "The workflow of tidy data, constructing plots and making data-driven decisions"
+author: "Professor Di Cook <br> Monash University"
+format: 
+  revealjs:
+    multiplex: true
+    footer: "R-Ladies Melbourne - Sep 1, 2022 - https://github.com/dicook/RLadies-Melbourne-2022"
+    theme: ["serif", "mystyle.scss"]
+    slide-number: c/t
+    incremental: false
+    title-slide-attributes:
+      data-background-image: img/rladieslogo-koala-hex.png
+      data-background-size: 20%  
+      data-background-position: 20% 90%  
+---
+
+## Outline
+
+- Introduction
+- Refresher on tidy data, mapping to plots
+    - Generating questions
+    - Determining choice of plots
+- Inference with plots, intro to nullabor
+    - Making lineups
+    - Calculating p-value and power
