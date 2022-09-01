@@ -1,3 +1,9 @@
 # RLadies_Melbourne_2022
 
 Materials for an R Ladies Melbourne presentation, Sep 1, 2022
+
+Presenter: Di Cook
+
+Website: [https://dicook.github.io/RLadies_Melboure_2022/](https://dicook.github.io/RLadies_Melboure_2022/)
+
+Download a [zip file of all of the materials](RLadies_Melboure_2022.zip)
