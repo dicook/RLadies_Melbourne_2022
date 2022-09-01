@@ -489,6 +489,6 @@ Slides produced using [quarto](https://quarto.org).
 
 Slides available from [https://github.com/dicook/RLadies_Melbourne_2022](https://github.com/dicook/RLadies_Melbourne_2022). 
 
-Viewable at [https://www.dicook.org/files/RLadies_Melbourne_2022/slides#/title-slide](https://www.dicook.org/files/RLadies_Melbourne_2022/slides#/title-slide).
+Viewable at [https://dicook.github.io/RLadies_Melboure_2022/slides.html)](https://dicook.github.io/RLadies_Melboure_2022/slides.html)).
 
 
