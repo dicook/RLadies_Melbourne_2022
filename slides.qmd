@@ -4,22 +4,491 @@ author: "Professor Di Cook <br> Monash University"
 format: 
   revealjs:
     multiplex: true
-    footer: "R-Ladies Melbourne - Sep 1, 2022 - https://github.com/dicook/RLadies-Melbourne-2022"
+    footer: "[https://github.com/dicook/RLadies_Melbourne_2022](https://github.com/dicook/RLadies_Melbourne_2022)"
     theme: ["serif", "mystyle.scss"]
     slide-number: c/t
-    incremental: false
+    incremental: true
     title-slide-attributes:
       data-background-image: img/rladieslogo-koala-hex.png
-      data-background-size: 20%  
+      data-background-size: 17%  
       data-background-position: 20% 90%  
 ---
 
-## Outline
+```{r setup}
+#| include: false
 
-- Introduction
-- Refresher on tidy data, mapping to plots
-    - Generating questions
-    - Determining choice of plots
-- Inference with plots, intro to nullabor
-    - Making lineups
-    - Calculating p-value and power
+library(knitr)
+options(htmltools.dir.version = FALSE, tibble.width = 45)
+opts_chunk$set(
+  echo = TRUE, 
+  warning = FALSE, 
+  message = FALSE, 
+  error=FALSE, 
+  comment = "#>",
+  fig.align = 'center', 
+  fig.width = 12, 
+  fig.height = 11, 
+  fig.show = 'hold', 
+  fig.retina = 5,
+  cache = FALSE
+)
+
+# libraries
+library(tidyverse)
+library(ggthemes)
+
+# for fonts
+library(showtext)
+font_add_google("Lato", "Lato")
+showtext_auto()
+theme_set(theme_minimal(base_family = "Lato") +
+  theme(axis.line = element_line(colour = "black"),
+        panel.border = element_rect(
+          colour = "black", fill = NA)))
+```
+
+## Hello
+
+Hi! `r emo::ji("wave")`
+I'm Di!
+
+It's wonderful to be see everyone in-person, and also glad that many more of you can join online.
+
+What we'll be doing today is downloading a data set from the web, tidying it, making plots, and making inference.
+
+You'll need these packages/collections installed: [tidyverse](https://www.tidyverse.org), [nullabor](http://dicook.github.io/nullabor/).
+
+And a copy of all the materials from today at [https://github.com/dicook/RLadies-Melbourne-2022](https://github.com/dicook/RLadies-Melbourne-2022).
+
+## Download the data
+
+Download a copy of the tuberculosis `case notifications` data from [WHO](https://extranet.who.int/tme/generateCSV.asp?ds=notifications). 
+
+<br><br><br><br>
+Or you can find this data `TB_notifications_2022-08-31.csv` in the `data` directory of the materials for today.
+
+## Read data into R
+
+::: columns
+::: column
+
+```{r read}
+library(tidyverse)
+# tb <- read_csv("https://extranet.who.int/tme/generateCSV.asp?ds=notifications")
+tb <- read_csv("data/TB_notifications_2022-08-31.csv") %>%
+  dplyr::select(country, iso3, year, contains("new_sp_"))
+
+```
+
+<br>
+
+```{r glimpse}
+glimpse(tb)
+```
+:::
+
+::: column
+- Is the data in tidy form?
+- No, variables are mixed in columns
+- What are the variables in the data?
+- country, iso3, sex, age
+:::
+:::
+
+## Wrangle into tidy form
+
+::: columns
+::: column
+
+```{r tb-wrangle}
+tb_tidy <- tb %>% 
+  dplyr::select(country, iso3, year, 
+         new_sp_m04:new_sp_fu) %>%
+  pivot_longer(cols=contains("new_sp"),
+               names_to="stuff", 
+               values_to="count") %>%
+  separate(stuff, c("stuff1", 
+                    "stuff2",
+                    "sexage")) %>%
+  dplyr::select(-stuff1, -stuff2) %>%
+  mutate(sex=substr(sexage, 1, 1), 
+         age=substr(sexage, 2, length(sexage))) %>%
+  dplyr::select(-sexage) %>%
+  select(country, iso3, year, sex, age, count) %>%
+  dplyr::filter(country == "Australia")
+glimpse(tb_tidy)
+```
+
+
+:::
+::: column
+Data is now clearly tidy form. Variables are `country`, `iso3`, `year`, `sex`, `age`.
+
+Focusing only on Australia, what would we like to know?
+
+1.  Is there an increasing or decreasing trend?
+2.  Is there a difference by age?
+3.  Is there a difference by sex?
+4.  Is there a difference by age and sex?
+5.  Is the trend different by age?
+6.  Is the trend different by sex?
+7.  Is the trend different by age and sex?
+
+:::
+:::
+
+## What plots to make?
+
+::: columns
+::: {.column .nonincremental}
+
+1.  Is there an increasing or decreasing trend?
+2.  Is there a difference by age?
+3.  Is there a difference by sex?
+4.  Is there a difference by age and sex?
+5.  Is the trend different by age?
+6.  Is the trend different by sex?
+7.  Is the trend different by age and sex?
+
+:::
+::: column
+
+What type of plot would we make to investigate Q1?
+
+What type of plot would we make to investigate Q6?
+
+:::
+:::
+
+## A little more cleaning
+
+```{r tb-more-clean}
+tb_tidy <- tb_tidy %>% 
+  dplyr::filter(!(age %in% c("04", "014", "514", "u"))) %>%
+  dplyr::filter(year > 1996, year < 2013) %>%
+  mutate(
+    age_group = factor(age, labels = c("15-24", "25-34", "35-44", "45-54", "55-64", "65+"))
+  )
+```
+
+::: {.nonincremental}
+- Change in recording method after 2012
+- Difference in recording for age under 15
+- Nicer labels for age category
+:::
+
+## Making inference with data plots
+
+<center>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/rsRjQDrDnY8" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+</center>
+
+If the data plot looks different from plots generated with a process that ensure there is no REAL pattern, then it is unlikely to have been generated by that process.
+
+## 
+
+```{r tb-trend, echo=TRUE}
+p <- tb_tidy %>% 
+  group_by(year) %>%
+  summarise(count = sum(count)) %>%
+  ggplot(aes(x=year, y=count)) +
+    geom_col()
+```
+
+For the question: Is there an increasing or decreasing trend?
+
+What would the pattern be if there was nothing there (null hypothesis)?
+
+What would be a possible null generator?
+
+## Make the plot, as a lineup
+
+::: columns
+::: {.column width="60%"}
+```{r tb-lineup-code, fig.width=8, fig.height=6, out.width="100%", message=TRUE}
+library(nullabor)
+tb_tidy_yr <- tb_tidy %>% 
+  group_by(year) %>%
+  summarise(count = sum(count)) 
+tb_lineup_1 <- ggplot(
+  lineup(null_permute("count"), 
+    tb_tidy_yr, n=12), 
+       aes(x=year, y=count)) +
+    geom_col() +
+  facet_wrap(~.sample) +
+  theme(strip.text=element_text(size=24, colour = "#C2185B"),
+        axis.text = element_blank(),
+        axis.title = element_blank())
+```
+:::
+::: {.column width="40%"}
+
+What does this do?
+
+This embeds the data plot into a matrix of null plots. Which allows one to assess whether any structure in the plot might just due to sample variation.
+
+Note the `decrypt` - position is encrypted so we don't know which plot is the data, and which are nulls.
+
+:::
+:::
+
+## Which plot is the most different?
+
+Go to www.mentimeter.com and enter code 2281 4390
+
+```{r tb-lineup-plot, fig.width=8, fig.height=6, out.width="100%", echo=FALSE}
+tb_lineup_1
+```
+
+## Compute statistical significance
+
+::: columns
+::: column
+```{r echo=FALSE}
+options(digits=3)
+```
+
+<br>
+```{r pvisual1, eval=TRUE}
+pvisual(x=10, K=40, m=12)
+```
+:::
+
+::: column
+
+- This computes the probability that $x$ (or more) observers our of $K$ chose the data plot from the lineup, assuming that there really is no pattern/trend. 
+- Now let's unpack the reasons for your choices. What was the pattern that drew you your choice of plot?
+
+:::
+:::
+
+## Let's do one more
+
+For the question: Is the trend different by sex?
+
+What would the pattern be if there was nothing there (null hypothesis)?
+
+How would you generate null plots?
+
+::: columns
+::: column
+```{r tb-yr-sex-trend1, echo=TRUE}
+tb_yr_sex2 <- tb_tidy %>% 
+  group_by(year, sex) %>%
+  summarise(count = sum(count)) %>%
+  ggplot(aes(x=year, y=count, colour=sex)) +
+    # geom_point() +
+    geom_smooth(se=FALSE) +
+    scale_colour_brewer("", palette="Dark2") 
+```
+:::
+
+::: column
+```{r tb-yr-sex-trend2, echo=TRUE}
+tb_yr_sex1 <- tb_tidy %>% 
+  group_by(year, sex) %>%
+  summarise(count = sum(count)) %>%
+  ggplot(aes(x=year, y=count, fill=sex)) +
+    geom_col(position="fill") +
+    scale_fill_brewer("", palette="Dark2")
+```
+:::
+:::
+
+Are each of these plots testing the same pattern?
+
+## Generating nulls: plot type 1
+
+```{r eval=FALSE}
+tb_yr_sex_null <- tb_tidy %>% 
+  group_by(year, sex) %>%
+  summarise(count = sum(count)) %>%
+  ungroup() %>%
+  group_by(sex) %>%
+  mutate(year = sample(year))
+```
+
+::: {.nonincremental}
+- Note that year is randomised within each sex. 
+- This code block would be re-run to generate $(m-1)$ null data sets. 
+:::
+
+And data is summarised as follows:
+
+```{r eval=FALSE}
+tb_yr_sex_data <- tb_tidy %>% 
+  group_by(year, sex) %>%
+  summarise(count = sum(count))
+```
+
+## Which plot has the most trend?
+
+```{r tb-lineup2, echo=FALSE, fig.width=8, fig.height=6, out.width="100%"}
+set.seed(2441)
+tb_yr_sex_l <- NULL
+pos <- sample(1:12)
+for (i in 1:11) {
+  tb_yr_sex_null <- tb_tidy %>% 
+    group_by(year, sex) %>%
+    summarise(count = sum(count)) %>%
+    ungroup() %>%
+    group_by(sex) %>%
+    mutate(year = sample(year), .sample = pos[i])
+  tb_yr_sex_l <- bind_rows(tb_yr_sex_l, 
+                                tb_yr_sex_null)
+}
+tb_yr_sex_data <- tb_tidy %>% 
+  group_by(year, sex) %>%
+  summarise(count = sum(count)) %>%
+  mutate(.sample = pos[12])
+tb_yr_sex_l <- bind_rows(tb_yr_sex_l,
+                              tb_yr_sex_data)
+tb_yr_sex_l %>%
+  ggplot(aes(x=year, y=count, colour=sex)) +
+    # geom_point() +
+    geom_smooth(se=FALSE) +
+    scale_colour_brewer("", palette="Dark2")  +
+    facet_wrap(~.sample, ncol=4) +
+    theme(legend.position = "none",  
+          strip.text=element_text(size=24, 
+                                  colour = "#C2185B"),
+        axis.text = element_blank(),
+        axis.title = element_blank())
+
+```
+
+## Generating nulls: plot type 2
+
+```{r tb-yr-sex-trend3, echo=TRUE}
+tb_yr_sex1 <- tb_tidy %>% 
+  group_by(year, sex) %>%
+  summarise(count = sum(count)) %>%
+  ggplot(aes(x=year, y=count, fill=sex)) +
+    geom_col(position="fill") +
+    scale_fill_brewer("", palette="Dark2")
+```
+
+- Compute the proportion of females for each year 
+- Average the proportions across year. If there is no trend in proportion, then the (true) proportion will be the same for all years.
+- Simulate from a binomial using this proportion, the same number of observations each year.
+
+## Generating nulls: plot type 2
+
+```{r}
+prop_f <- tb_tidy %>% 
+  group_by(year, sex) %>%
+  summarise(count = sum(count)) %>%
+  pivot_wider(names_from = "sex", values_from = count) %>%
+  mutate(p = f/(f+m)) %>%
+  ungroup() %>%
+  summarise(p = mean(p)) %>%
+  pull()
+prop_f
+```
+
+Generate null data with 
+
+```{r eval=FALSE}
+tb_yr_sex_null <- tb_tidy %>% 
+  group_by(year) %>%
+  summarise(count = sum(count)) %>%
+  mutate(f = 0, m = 0)
+for (i in 1:length(tb_yr_sex_null$year)) {
+  new_sex <- rbinom(tb_yr_sex_null$count[i], 1, prop_f)
+  tb_yr_sex_null$f[i] <- sum(new_sex)
+  tb_yr_sex_null$m[i] <- length(new_sex) - sum(new_sex)
+}
+tb_yr_sex_null <- tb_yr_sex_null %>%
+  dplyr::select(-count) %>%
+  pivot_longer(cols = c("f", "m"), names_to="sex", values_to="count")
+```
+
+```{r eval=FALSE, echo=FALSE}
+tb_yr_sex_data <- tb_tidy %>% 
+  group_by(year, sex) %>%
+  summarise(count = sum(count))
+tb_yr_psex_l <- lineup(null_dist("sex", "binom",
+            params = list(n=1, size=200, prob=prop_f)),
+            tb_yr_sex_data) %>%
+    ggplot(aes(x=year, y=count, fill=sex)) +
+    geom_col(position="fill") +
+    scale_fill_brewer("", palette="Dark2") +
+  facet_wrap(~.sample, ncol=4) +
+    theme(legend.position = "none",  
+          strip.text=element_text(size=24, 
+                                  colour = "#C2185B"),
+        axis.text = element_blank(),
+        axis.title = element_blank()) 
+
+```
+
+
+## Which plot has the most trend?
+
+```{r tb-lineup3, echo=FALSE, fig.width=8, fig.height=6, out.width="100%"}
+set.seed(2446)
+pos2 <- sample(1:12)
+tb_yr_sex_l2 <- NULL
+for (i in 1:11) {
+  tb_yr_sex_null <- tb_tidy %>% 
+    group_by(year) %>%
+    summarise(count = sum(count)) %>%
+    mutate(f = 0, m = 0)
+  for (j in 1:length(tb_yr_sex_null$year)) {
+    new_sex <- rbinom(tb_yr_sex_null$count[j], 1, prop_f)
+    tb_yr_sex_null$f[j] <- sum(new_sex)
+    tb_yr_sex_null$m[j] <- length(new_sex) - sum(new_sex)
+  }
+  tb_yr_sex_null <- tb_yr_sex_null %>%
+    dplyr::select(-count) %>%
+    pivot_longer(cols = c("f", "m"), 
+                 names_to="sex", 
+                 values_to="count") %>%
+    mutate(.sample = pos2[i])
+  tb_yr_sex_l2 <- bind_rows(tb_yr_sex_l2, 
+                                tb_yr_sex_null)
+}
+
+tb_yr_sex_data <- tb_tidy %>% 
+  group_by(year, sex) %>%
+  summarise(count = sum(count)) %>%
+  mutate(.sample = pos2[12])
+tb_yr_sex_l2 <- bind_rows(tb_yr_sex_l2,
+                              tb_yr_sex_data)
+tb_yr_sex_l2 %>%
+    ggplot(aes(x=year, y=count, fill=sex)) +
+    geom_col(position="fill") +
+    scale_fill_brewer("", palette="Dark2") +
+  facet_wrap(~.sample, ncol=4) +
+    theme(legend.position = "none",  
+          strip.text=element_text(size=24, 
+                                  colour = "#C2185B"),
+        axis.text = element_blank(),
+        axis.title = element_blank()) 
+
+```
+
+## Summary
+
+::: {.nonincremental}
+- Putting your data into tidy form, connects it better with statistical thinking
+- It makes is easier to make effective data plots, and test their effectiveness
+- Using the lineup approach allows one to determine if the pattern is real, or spurious. 
+:::
+
+Package to use for generating the lineups is [nullabor](http://dicook.github.io/nullabor/).
+
+
+## Further reading
+
+[Wickham et al (2010)](https://ieeexplore.ieee.org/document/5613434) Graphical Inference for Infovis <br> [Hofmann et al (2012)](https://pubmed.ncbi.nlm.nih.gov/26357152/) Graphical Tests for Power Comparison 
+
+## Acknowledgements
+
+Slides produced using [quarto](https://quarto.org).
+
+Slides available from [https://github.com/dicook/RLadies_Melbourne_2022](https://github.com/dicook/RLadies_Melbourne_2022). 
+
+Viewable at [https://www.dicook.org/files/RLadies_Melbourne_2022/slides#/title-slide](https://www.dicook.org/files/RLadies_Melbourne_2022/slides#/title-slide).
+
+

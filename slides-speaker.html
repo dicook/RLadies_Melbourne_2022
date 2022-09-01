@@ -23,6 +23,70 @@
     div.column{display: inline-block; vertical-align: top; width: 50%;}
     div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
     ul.task-list{list-style: none;}
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      { color: #003b4f; background-color: #f1f3f5; }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span { color: #003b4f; } /* Normal */
+    code span.al { color: #ad0000; } /* Alert */
+    code span.an { color: #5e5e5e; } /* Annotation */
+    code span.at { color: #657422; } /* Attribute */
+    code span.bn { color: #ad0000; } /* BaseN */
+    code span.bu { } /* BuiltIn */
+    code span.cf { color: #003b4f; } /* ControlFlow */
+    code span.ch { color: #20794d; } /* Char */
+    code span.cn { color: #8f5902; } /* Constant */
+    code span.co { color: #5e5e5e; } /* Comment */
+    code span.cv { color: #5e5e5e; font-style: italic; } /* CommentVar */
+    code span.do { color: #5e5e5e; font-style: italic; } /* Documentation */
+    code span.dt { color: #ad0000; } /* DataType */
+    code span.dv { color: #ad0000; } /* DecVal */
+    code span.er { color: #ad0000; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #ad0000; } /* Float */
+    code span.fu { color: #4758ab; } /* Function */
+    code span.im { color: #00769e; } /* Import */
+    code span.in { color: #5e5e5e; } /* Information */
+    code span.kw { color: #003b4f; } /* Keyword */
+    code span.op { color: #5e5e5e; } /* Operator */
+    code span.ot { color: #003b4f; } /* Other */
+    code span.pp { color: #ad0000; } /* Preprocessor */
+    code span.sc { color: #5e5e5e; } /* SpecialChar */
+    code span.ss { color: #20794d; } /* SpecialString */
+    code span.st { color: #20794d; } /* String */
+    code span.va { color: #111111; } /* Variable */
+    code span.vs { color: #20794d; } /* VerbatimString */
+    code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   </style>
   <link rel="stylesheet" href="slides_files/libs/revealjs/dist/theme/quarto.css" id="theme">
   <link href="slides_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
@@ -318,28 +382,370 @@
   <div class="reveal">
     <div class="slides">
 
-<section id="title-slide" data-background-image="img/rladieslogo-koala-hex.png" data-background-position="20% 90%" data-background-size="20%" class="center">
+<section id="title-slide" data-background-image="img/rladieslogo-koala-hex.png" data-background-position="20% 90%" data-background-size="17%" class="center">
   <h1 class="title">The workflow of tidy data, constructing plots and making data-driven decisions</h1>
   <p class="author">Professor Di Cook <br> Monash University</p>
 </section>
 
-<section id="outline" class="slide level2">
-<h2>Outline</h2>
+<section id="hello" class="slide level2">
+<h2>Hello</h2>
+<p>Hi! 👋 I’m Di!</p>
+<p>It’s wonderful to be see everyone in-person, and also glad that many more of you can join online.</p>
+<p>What we’ll be doing today is downloading a data set from the web, tidying it, making plots, and making inference.</p>
+<p>You’ll need these packages/collections installed: <a href="https://www.tidyverse.org">tidyverse</a>, <a href="http://dicook.github.io/nullabor/">nullabor</a>.</p>
+<p>And a copy of all the materials from today at <a href="https://github.com/dicook/RLadies-Melbourne-2022">https://github.com/dicook/RLadies-Melbourne-2022</a>.</p>
+</section>
+<section id="download-the-data" class="slide level2">
+<h2>Download the data</h2>
+<p>Download a copy of the tuberculosis <code>case notifications</code> data from <a href="https://extranet.who.int/tme/generateCSV.asp?ds=notifications">WHO</a>.</p>
+<p><br><br><br><br> Or you can find this data <code>TB_notifications_2022-08-31.csv</code> in the <code>data</code> directory of the materials for today.</p>
+</section>
+<section id="read-data-into-r" class="slide level2">
+<h2>Read data into R</h2>
+<div class="columns">
+<div class="column">
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-2"><a href="#cb1-2"></a><span class="co"># tb &lt;- read_csv("https://extranet.who.int/tme/generateCSV.asp?ds=notifications")</span></span>
+<span id="cb1-3"><a href="#cb1-3"></a>tb <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/TB_notifications_2022-08-31.csv"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb1-4"><a href="#cb1-4"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(country, iso3, year, <span class="fu">contains</span>(<span class="st">"new_sp_"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><br></p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="fu">glimpse</span>(tb)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>#&gt; Rows: 8,707
+#&gt; Columns: 23
+#&gt; $ country      &lt;chr&gt; "Afghanistan", "Afghan…
+#&gt; $ iso3         &lt;chr&gt; "AFG", "AFG", "AFG", "…
+#&gt; $ year         &lt;dbl&gt; 1980, 1981, 1982, 1983…
+#&gt; $ new_sp_m04   &lt;dbl&gt; NA, NA, NA, NA, NA, NA…
+#&gt; $ new_sp_m514  &lt;dbl&gt; NA, NA, NA, NA, NA, NA…
+#&gt; $ new_sp_m014  &lt;dbl&gt; NA, NA, NA, NA, NA, NA…
+#&gt; $ new_sp_m1524 &lt;dbl&gt; NA, NA, NA, NA, NA, NA…
+#&gt; $ new_sp_m2534 &lt;dbl&gt; NA, NA, NA, NA, NA, NA…
+#&gt; $ new_sp_m3544 &lt;dbl&gt; NA, NA, NA, NA, NA, NA…
+#&gt; $ new_sp_m4554 &lt;dbl&gt; NA, NA, NA, NA, NA, NA…
+#&gt; $ new_sp_m5564 &lt;dbl&gt; NA, NA, NA, NA, NA, NA…
+#&gt; $ new_sp_m65   &lt;dbl&gt; NA, NA, NA, NA, NA, NA…
+#&gt; $ new_sp_mu    &lt;dbl&gt; NA, NA, NA, NA, NA, NA…
+#&gt; $ new_sp_f04   &lt;dbl&gt; NA, NA, NA, NA, NA, NA…
+#&gt; $ new_sp_f514  &lt;dbl&gt; NA, NA, NA, NA, NA, NA…
+#&gt; $ new_sp_f014  &lt;dbl&gt; NA, NA, NA, NA, NA, NA…
+#&gt; $ new_sp_f1524 &lt;dbl&gt; NA, NA, NA, NA, NA, NA…
+#&gt; $ new_sp_f2534 &lt;dbl&gt; NA, NA, NA, NA, NA, NA…
+#&gt; $ new_sp_f3544 &lt;dbl&gt; NA, NA, NA, NA, NA, NA…
+#&gt; $ new_sp_f4554 &lt;dbl&gt; NA, NA, NA, NA, NA, NA…
+#&gt; $ new_sp_f5564 &lt;dbl&gt; NA, NA, NA, NA, NA, NA…
+#&gt; $ new_sp_f65   &lt;dbl&gt; NA, NA, NA, NA, NA, NA…
+#&gt; $ new_sp_fu    &lt;dbl&gt; NA, NA, NA, NA, NA, NA…</code></pre>
+</div>
+</div>
+</div><div class="column">
 <ul>
-<li>Introduction</li>
-<li>Refresher on tidy data, mapping to plots
-<ul>
-<li>Generating questions</li>
-<li>Determining choice of plots</li>
-</ul></li>
-<li>Inference with plots, intro to nullabor
-<ul>
-<li>Making lineups</li>
-<li>Calculating p-value and power</li>
-</ul></li>
+<li class="fragment">Is the data in tidy form?</li>
+<li class="fragment">No, variables are mixed in columns</li>
+<li class="fragment">What are the variables in the data?</li>
+<li class="fragment">country, iso3, sex, age</li>
 </ul>
+</div>
+</div>
+</section>
+<section id="wrangle-into-tidy-form" class="slide level2">
+<h2>Wrangle into tidy form</h2>
+<div class="columns">
+<div class="column">
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a>tb_tidy <span class="ot">&lt;-</span> tb <span class="sc">%&gt;%</span> </span>
+<span id="cb4-2"><a href="#cb4-2"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(country, iso3, year, </span>
+<span id="cb4-3"><a href="#cb4-3"></a>         new_sp_m04<span class="sc">:</span>new_sp_fu) <span class="sc">%&gt;%</span></span>
+<span id="cb4-4"><a href="#cb4-4"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols=</span><span class="fu">contains</span>(<span class="st">"new_sp"</span>),</span>
+<span id="cb4-5"><a href="#cb4-5"></a>               <span class="at">names_to=</span><span class="st">"stuff"</span>, </span>
+<span id="cb4-6"><a href="#cb4-6"></a>               <span class="at">values_to=</span><span class="st">"count"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb4-7"><a href="#cb4-7"></a>  <span class="fu">separate</span>(stuff, <span class="fu">c</span>(<span class="st">"stuff1"</span>, </span>
+<span id="cb4-8"><a href="#cb4-8"></a>                    <span class="st">"stuff2"</span>,</span>
+<span id="cb4-9"><a href="#cb4-9"></a>                    <span class="st">"sexage"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb4-10"><a href="#cb4-10"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(<span class="sc">-</span>stuff1, <span class="sc">-</span>stuff2) <span class="sc">%&gt;%</span></span>
+<span id="cb4-11"><a href="#cb4-11"></a>  <span class="fu">mutate</span>(<span class="at">sex=</span><span class="fu">substr</span>(sexage, <span class="dv">1</span>, <span class="dv">1</span>), </span>
+<span id="cb4-12"><a href="#cb4-12"></a>         <span class="at">age=</span><span class="fu">substr</span>(sexage, <span class="dv">2</span>, <span class="fu">length</span>(sexage))) <span class="sc">%&gt;%</span></span>
+<span id="cb4-13"><a href="#cb4-13"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(<span class="sc">-</span>sexage) <span class="sc">%&gt;%</span></span>
+<span id="cb4-14"><a href="#cb4-14"></a>  <span class="fu">select</span>(country, iso3, year, sex, age, count) <span class="sc">%&gt;%</span></span>
+<span id="cb4-15"><a href="#cb4-15"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(country <span class="sc">==</span> <span class="st">"Australia"</span>)</span>
+<span id="cb4-16"><a href="#cb4-16"></a><span class="fu">glimpse</span>(tb_tidy)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>#&gt; Rows: 820
+#&gt; Columns: 6
+#&gt; $ country &lt;chr&gt; "Australia", "Australia", "…
+#&gt; $ iso3    &lt;chr&gt; "AUS", "AUS", "AUS", "AUS",…
+#&gt; $ year    &lt;dbl&gt; 1980, 1980, 1980, 1980, 198…
+#&gt; $ sex     &lt;chr&gt; "m", "m", "m", "m", "m", "m…
+#&gt; $ age     &lt;chr&gt; "04", "514", "014", "1524",…
+#&gt; $ count   &lt;dbl&gt; NA, NA, NA, NA, NA, NA, NA,…</code></pre>
+</div>
+</div>
+</div><div class="column">
+<p>Data is now clearly tidy form. Variables are <code>country</code>, <code>iso3</code>, <code>year</code>, <code>sex</code>, <code>age</code>.</p>
+<p>Focusing only on Australia, what would we like to know?</p>
+<ol type="1">
+<li class="fragment">Is there an increasing or decreasing trend?</li>
+<li class="fragment">Is there a difference by age?</li>
+<li class="fragment">Is there a difference by sex?</li>
+<li class="fragment">Is there a difference by age and sex?</li>
+<li class="fragment">Is the trend different by age?</li>
+<li class="fragment">Is the trend different by sex?</li>
+<li class="fragment">Is the trend different by age and sex?</li>
+</ol>
+</div>
+</div>
+</section>
+<section id="what-plots-to-make" class="slide level2">
+<h2>What plots to make?</h2>
+<div class="columns">
+<div class="column">
+<ol type="1">
+<li>Is there an increasing or decreasing trend?</li>
+<li>Is there a difference by age?</li>
+<li>Is there a difference by sex?</li>
+<li>Is there a difference by age and sex?</li>
+<li>Is the trend different by age?</li>
+<li>Is the trend different by sex?</li>
+<li>Is the trend different by age and sex?</li>
+</ol>
+</div><div class="column">
+<p>What type of plot would we make to investigate Q1?</p>
+<p>What type of plot would we make to investigate Q6?</p>
+</div>
+</div>
+</section>
+<section id="a-little-more-cleaning" class="slide level2">
+<h2>A little more cleaning</h2>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a>tb_tidy <span class="ot">&lt;-</span> tb_tidy <span class="sc">%&gt;%</span> </span>
+<span id="cb6-2"><a href="#cb6-2"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(<span class="sc">!</span>(age <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"04"</span>, <span class="st">"014"</span>, <span class="st">"514"</span>, <span class="st">"u"</span>))) <span class="sc">%&gt;%</span></span>
+<span id="cb6-3"><a href="#cb6-3"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(year <span class="sc">&gt;</span> <span class="dv">1996</span>, year <span class="sc">&lt;</span> <span class="dv">2013</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb6-4"><a href="#cb6-4"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb6-5"><a href="#cb6-5"></a>    <span class="at">age_group =</span> <span class="fu">factor</span>(age, <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"15-24"</span>, <span class="st">"25-34"</span>, <span class="st">"35-44"</span>, <span class="st">"45-54"</span>, <span class="st">"55-64"</span>, <span class="st">"65+"</span>))</span>
+<span id="cb6-6"><a href="#cb6-6"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div>
+<ul>
+<li>Change in recording method after 2012</li>
+<li>Difference in recording for age under 15</li>
+<li>Nicer labels for age category</li>
+</ul>
+</div>
+</section>
+<section id="making-inference-with-data-plots" class="slide level2">
+<h2>Making inference with data plots</h2>
+<center>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/rsRjQDrDnY8" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen="">
+</iframe>
+</center>
+<p>If the data plot looks different from plots generated with a process that ensure there is no REAL pattern, then it is unlikely to have been generated by that process.</p>
+</section>
+<section id="section" class="slide level2">
+<h2></h2>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a>p <span class="ot">&lt;-</span> tb_tidy <span class="sc">%&gt;%</span> </span>
+<span id="cb7-2"><a href="#cb7-2"></a>  <span class="fu">group_by</span>(year) <span class="sc">%&gt;%</span></span>
+<span id="cb7-3"><a href="#cb7-3"></a>  <span class="fu">summarise</span>(<span class="at">count =</span> <span class="fu">sum</span>(count)) <span class="sc">%&gt;%</span></span>
+<span id="cb7-4"><a href="#cb7-4"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x=</span>year, <span class="at">y=</span>count)) <span class="sc">+</span></span>
+<span id="cb7-5"><a href="#cb7-5"></a>    <span class="fu">geom_col</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>For the question: Is there an increasing or decreasing trend?</p>
+<p>What would the pattern be if there was nothing there (null hypothesis)?</p>
+<p>What would be a possible null generator?</p>
+</section>
+<section id="make-the-plot-as-a-lineup" class="slide level2">
+<h2>Make the plot, as a lineup</h2>
+<div class="columns">
+<div class="column" style="width:60%;">
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a><span class="fu">library</span>(nullabor)</span>
+<span id="cb8-2"><a href="#cb8-2"></a>tb_tidy_yr <span class="ot">&lt;-</span> tb_tidy <span class="sc">%&gt;%</span> </span>
+<span id="cb8-3"><a href="#cb8-3"></a>  <span class="fu">group_by</span>(year) <span class="sc">%&gt;%</span></span>
+<span id="cb8-4"><a href="#cb8-4"></a>  <span class="fu">summarise</span>(<span class="at">count =</span> <span class="fu">sum</span>(count)) </span>
+<span id="cb8-5"><a href="#cb8-5"></a>tb_lineup_1 <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(</span>
+<span id="cb8-6"><a href="#cb8-6"></a>  <span class="fu">lineup</span>(<span class="fu">null_permute</span>(<span class="st">"count"</span>), </span>
+<span id="cb8-7"><a href="#cb8-7"></a>    tb_tidy_yr, <span class="at">n=</span><span class="dv">12</span>), </span>
+<span id="cb8-8"><a href="#cb8-8"></a>       <span class="fu">aes</span>(<span class="at">x=</span>year, <span class="at">y=</span>count)) <span class="sc">+</span></span>
+<span id="cb8-9"><a href="#cb8-9"></a>    <span class="fu">geom_col</span>() <span class="sc">+</span></span>
+<span id="cb8-10"><a href="#cb8-10"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>.sample) <span class="sc">+</span></span>
+<span id="cb8-11"><a href="#cb8-11"></a>  <span class="fu">theme</span>(<span class="at">strip.text=</span><span class="fu">element_text</span>(<span class="at">size=</span><span class="dv">24</span>, <span class="at">colour =</span> <span class="st">"#C2185B"</span>),</span>
+<span id="cb8-12"><a href="#cb8-12"></a>        <span class="at">axis.text =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb8-13"><a href="#cb8-13"></a>        <span class="at">axis.title =</span> <span class="fu">element_blank</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>#&gt; decrypt("wvLp U5E5 Ha es9HEHsa hM")</code></pre>
+</div>
+</div>
+</div><div class="column" style="width:40%;">
+<p>What does this do?</p>
+<p>This embeds the data plot into a matrix of null plots. Which allows one to assess whether any structure in the plot might just due to sample variation.</p>
+<p>Note the <code>decrypt</code> - position is encrypted so we don’t know which plot is the data, and which are nulls.</p>
+</div>
+</div>
+</section>
+<section id="which-plot-is-the-most-different" class="slide level2">
+<h2>Which plot is the most different?</h2>
+<p>Go to www.mentimeter.com and enter code 2281 4390</p>
+
+<img data-src="slides_files/figure-revealjs/tb-lineup-plot-1.png" style="width:100.0%" class="r-stretch quarto-figure-center"></section>
+<section id="compute-statistical-significance" class="slide level2">
+<h2>Compute statistical significance</h2>
+<div class="columns">
+<div class="column">
+<div class="cell" data-layout-align="center">
+
+</div>
+<p><br></p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a><span class="fu">pvisual</span>(<span class="at">x=</span><span class="dv">10</span>, <span class="at">K=</span><span class="dv">40</span>, <span class="at">m=</span><span class="dv">12</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>#&gt;       x simulated   binom
+#&gt; [1,] 10    0.0211 0.00132</code></pre>
+</div>
+</div>
+</div><div class="column">
+<ul>
+<li class="fragment">This computes the probability that <span class="math inline">\(x\)</span> (or more) observers our of <span class="math inline">\(K\)</span> chose the data plot from the lineup, assuming that there really is no pattern/trend.</li>
+<li class="fragment">Now let’s unpack the reasons for your choices. What was the pattern that drew you your choice of plot?</li>
+</ul>
+</div>
+</div>
+</section>
+<section id="lets-do-one-more" class="slide level2">
+<h2>Let’s do one more</h2>
+<p>For the question: Is the trend different by sex?</p>
+<p>What would the pattern be if there was nothing there (null hypothesis)?</p>
+<p>How would you generate null plots?</p>
+<div class="columns">
+<div class="column">
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a>tb_yr_sex2 <span class="ot">&lt;-</span> tb_tidy <span class="sc">%&gt;%</span> </span>
+<span id="cb12-2"><a href="#cb12-2"></a>  <span class="fu">group_by</span>(year, sex) <span class="sc">%&gt;%</span></span>
+<span id="cb12-3"><a href="#cb12-3"></a>  <span class="fu">summarise</span>(<span class="at">count =</span> <span class="fu">sum</span>(count)) <span class="sc">%&gt;%</span></span>
+<span id="cb12-4"><a href="#cb12-4"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x=</span>year, <span class="at">y=</span>count, <span class="at">colour=</span>sex)) <span class="sc">+</span></span>
+<span id="cb12-5"><a href="#cb12-5"></a>    <span class="co"># geom_point() +</span></span>
+<span id="cb12-6"><a href="#cb12-6"></a>    <span class="fu">geom_smooth</span>(<span class="at">se=</span><span class="cn">FALSE</span>) <span class="sc">+</span></span>
+<span id="cb12-7"><a href="#cb12-7"></a>    <span class="fu">scale_colour_brewer</span>(<span class="st">""</span>, <span class="at">palette=</span><span class="st">"Dark2"</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div><div class="column">
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1"></a>tb_yr_sex1 <span class="ot">&lt;-</span> tb_tidy <span class="sc">%&gt;%</span> </span>
+<span id="cb13-2"><a href="#cb13-2"></a>  <span class="fu">group_by</span>(year, sex) <span class="sc">%&gt;%</span></span>
+<span id="cb13-3"><a href="#cb13-3"></a>  <span class="fu">summarise</span>(<span class="at">count =</span> <span class="fu">sum</span>(count)) <span class="sc">%&gt;%</span></span>
+<span id="cb13-4"><a href="#cb13-4"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x=</span>year, <span class="at">y=</span>count, <span class="at">fill=</span>sex)) <span class="sc">+</span></span>
+<span id="cb13-5"><a href="#cb13-5"></a>    <span class="fu">geom_col</span>(<span class="at">position=</span><span class="st">"fill"</span>) <span class="sc">+</span></span>
+<span id="cb13-6"><a href="#cb13-6"></a>    <span class="fu">scale_fill_brewer</span>(<span class="st">""</span>, <span class="at">palette=</span><span class="st">"Dark2"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+</div>
+<p>Are each of these plots testing the same pattern?</p>
+</section>
+<section id="generating-nulls-plot-type-1" class="slide level2">
+<h2>Generating nulls: plot type 1</h2>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1"></a>tb_yr_sex_null <span class="ot">&lt;-</span> tb_tidy <span class="sc">%&gt;%</span> </span>
+<span id="cb14-2"><a href="#cb14-2"></a>  <span class="fu">group_by</span>(year, sex) <span class="sc">%&gt;%</span></span>
+<span id="cb14-3"><a href="#cb14-3"></a>  <span class="fu">summarise</span>(<span class="at">count =</span> <span class="fu">sum</span>(count)) <span class="sc">%&gt;%</span></span>
+<span id="cb14-4"><a href="#cb14-4"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb14-5"><a href="#cb14-5"></a>  <span class="fu">group_by</span>(sex) <span class="sc">%&gt;%</span></span>
+<span id="cb14-6"><a href="#cb14-6"></a>  <span class="fu">mutate</span>(<span class="at">year =</span> <span class="fu">sample</span>(year))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div>
+<ul>
+<li>Note that year is randomised within each sex.</li>
+<li>This code block would be re-run to generate <span class="math inline">\((m-1)\)</span> null data sets.</li>
+</ul>
+</div>
+<p>And data is summarised as follows:</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1"></a>tb_yr_sex_data <span class="ot">&lt;-</span> tb_tidy <span class="sc">%&gt;%</span> </span>
+<span id="cb15-2"><a href="#cb15-2"></a>  <span class="fu">group_by</span>(year, sex) <span class="sc">%&gt;%</span></span>
+<span id="cb15-3"><a href="#cb15-3"></a>  <span class="fu">summarise</span>(<span class="at">count =</span> <span class="fu">sum</span>(count))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="which-plot-has-the-most-trend" class="slide level2">
+<h2>Which plot has the most trend?</h2>
+
+<img data-src="slides_files/figure-revealjs/tb-lineup2-1.png" style="width:100.0%" class="r-stretch quarto-figure-center"></section>
+<section id="generating-nulls-plot-type-2" class="slide level2">
+<h2>Generating nulls: plot type 2</h2>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1"></a>tb_yr_sex1 <span class="ot">&lt;-</span> tb_tidy <span class="sc">%&gt;%</span> </span>
+<span id="cb16-2"><a href="#cb16-2"></a>  <span class="fu">group_by</span>(year, sex) <span class="sc">%&gt;%</span></span>
+<span id="cb16-3"><a href="#cb16-3"></a>  <span class="fu">summarise</span>(<span class="at">count =</span> <span class="fu">sum</span>(count)) <span class="sc">%&gt;%</span></span>
+<span id="cb16-4"><a href="#cb16-4"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x=</span>year, <span class="at">y=</span>count, <span class="at">fill=</span>sex)) <span class="sc">+</span></span>
+<span id="cb16-5"><a href="#cb16-5"></a>    <span class="fu">geom_col</span>(<span class="at">position=</span><span class="st">"fill"</span>) <span class="sc">+</span></span>
+<span id="cb16-6"><a href="#cb16-6"></a>    <span class="fu">scale_fill_brewer</span>(<span class="st">""</span>, <span class="at">palette=</span><span class="st">"Dark2"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<ul>
+<li class="fragment">Compute the proportion of females for each year</li>
+<li class="fragment">Average the proportions across year. If there is no trend in proportion, then the (true) proportion will be the same for all years.</li>
+<li class="fragment">Simulate from a binomial using this proportion, the same number of observations each year.</li>
+</ul>
+</section>
+<section id="generating-nulls-plot-type-2-1" class="slide level2">
+<h2>Generating nulls: plot type 2</h2>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1"></a>prop_f <span class="ot">&lt;-</span> tb_tidy <span class="sc">%&gt;%</span> </span>
+<span id="cb17-2"><a href="#cb17-2"></a>  <span class="fu">group_by</span>(year, sex) <span class="sc">%&gt;%</span></span>
+<span id="cb17-3"><a href="#cb17-3"></a>  <span class="fu">summarise</span>(<span class="at">count =</span> <span class="fu">sum</span>(count)) <span class="sc">%&gt;%</span></span>
+<span id="cb17-4"><a href="#cb17-4"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> <span class="st">"sex"</span>, <span class="at">values_from =</span> count) <span class="sc">%&gt;%</span></span>
+<span id="cb17-5"><a href="#cb17-5"></a>  <span class="fu">mutate</span>(<span class="at">p =</span> f<span class="sc">/</span>(f<span class="sc">+</span>m)) <span class="sc">%&gt;%</span></span>
+<span id="cb17-6"><a href="#cb17-6"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb17-7"><a href="#cb17-7"></a>  <span class="fu">summarise</span>(<span class="at">p =</span> <span class="fu">mean</span>(p)) <span class="sc">%&gt;%</span></span>
+<span id="cb17-8"><a href="#cb17-8"></a>  <span class="fu">pull</span>()</span>
+<span id="cb17-9"><a href="#cb17-9"></a>prop_f</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>#&gt; [1] 0.383</code></pre>
+</div>
+</div>
+<p>Generate null data with</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1"></a>tb_yr_sex_null <span class="ot">&lt;-</span> tb_tidy <span class="sc">%&gt;%</span> </span>
+<span id="cb19-2"><a href="#cb19-2"></a>  <span class="fu">group_by</span>(year) <span class="sc">%&gt;%</span></span>
+<span id="cb19-3"><a href="#cb19-3"></a>  <span class="fu">summarise</span>(<span class="at">count =</span> <span class="fu">sum</span>(count)) <span class="sc">%&gt;%</span></span>
+<span id="cb19-4"><a href="#cb19-4"></a>  <span class="fu">mutate</span>(<span class="at">f =</span> <span class="dv">0</span>, <span class="at">m =</span> <span class="dv">0</span>)</span>
+<span id="cb19-5"><a href="#cb19-5"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(tb_yr_sex_null<span class="sc">$</span>year)) {</span>
+<span id="cb19-6"><a href="#cb19-6"></a>  new_sex <span class="ot">&lt;-</span> <span class="fu">rbinom</span>(tb_yr_sex_null<span class="sc">$</span>count[i], <span class="dv">1</span>, prop_f)</span>
+<span id="cb19-7"><a href="#cb19-7"></a>  tb_yr_sex_null<span class="sc">$</span>f[i] <span class="ot">&lt;-</span> <span class="fu">sum</span>(new_sex)</span>
+<span id="cb19-8"><a href="#cb19-8"></a>  tb_yr_sex_null<span class="sc">$</span>m[i] <span class="ot">&lt;-</span> <span class="fu">length</span>(new_sex) <span class="sc">-</span> <span class="fu">sum</span>(new_sex)</span>
+<span id="cb19-9"><a href="#cb19-9"></a>}</span>
+<span id="cb19-10"><a href="#cb19-10"></a>tb_yr_sex_null <span class="ot">&lt;-</span> tb_yr_sex_null <span class="sc">%&gt;%</span></span>
+<span id="cb19-11"><a href="#cb19-11"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(<span class="sc">-</span>count) <span class="sc">%&gt;%</span></span>
+<span id="cb19-12"><a href="#cb19-12"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="fu">c</span>(<span class="st">"f"</span>, <span class="st">"m"</span>), <span class="at">names_to=</span><span class="st">"sex"</span>, <span class="at">values_to=</span><span class="st">"count"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-layout-align="center">
+
+</div>
+</section>
+<section id="which-plot-has-the-most-trend-1" class="slide level2">
+<h2>Which plot has the most trend?</h2>
+
+<img data-src="slides_files/figure-revealjs/tb-lineup3-1.png" style="width:100.0%" class="r-stretch quarto-figure-center"></section>
+<section id="summary" class="slide level2">
+<h2>Summary</h2>
+<div>
+<ul>
+<li>Putting your data into tidy form, connects it better with statistical thinking</li>
+<li>It makes is easier to make effective data plots, and test their effectiveness</li>
+<li>Using the lineup approach allows one to determine if the pattern is real, or spurious.</li>
+</ul>
+</div>
+<p>Package to use for generating the lineups is <a href="http://dicook.github.io/nullabor/">nullabor</a>.</p>
+</section>
+<section id="further-reading" class="slide level2">
+<h2>Further reading</h2>
+<p><a href="https://ieeexplore.ieee.org/document/5613434">Wickham et al (2010)</a> Graphical Inference for Infovis <br> <a href="https://pubmed.ncbi.nlm.nih.gov/26357152/">Hofmann et al (2012)</a> Graphical Tests for Power Comparison</p>
+</section>
+<section id="acknowledgements" class="slide level2">
+<h2>Acknowledgements</h2>
+<p>Slides produced using <a href="https://quarto.org">quarto</a>.</p>
+<p>Slides available from <a href="https://github.com/dicook/RLadies_Melbourne_2022">https://github.com/dicook/RLadies_Melbourne_2022</a>.</p>
+<p>Viewable at <a href="https://www.dicook.org/files/RLadies_Melbourne_2022/slides#/title-slide">https://www.dicook.org/files/RLadies_Melbourne_2022/slides#/title-slide</a>.</p>
 <div class="footer footer-default">
-<p>R-Ladies Melbourne - Sep 1, 2022 - https://github.com/dicook/RLadies-Melbourne-2022</p>
+<p><a href="https://github.com/dicook/RLadies_Melbourne_2022">https://github.com/dicook/RLadies_Melbourne_2022</a></p>
 </div>
 </section>
     </div>
@@ -556,6 +962,48 @@
         ]
       });
     </script>
+    
+    <script>
+      // htmlwidgets need to know to resize themselves when slides are shown/hidden.
+      // Fire the "slideenter" event (handled by htmlwidgets.js) when the current
+      // slide changes (different for each slide format).
+      (function () {
+        function fireSlideChanged(previousSlide, currentSlide) {
+
+          // dispatch for htmlwidgets
+          const event = window.document.createEvent("Event");
+          event.initEvent("slideenter", true, true);
+          window.document.dispatchEvent(event);
+
+          // dispatch for shiny
+          if (window.jQuery) {
+            if (previousSlide) {
+              window.jQuery(previousSlide).trigger("hidden");
+            }
+            if (currentSlide) {
+              window.jQuery(currentSlide).trigger("shown");
+            }
+          }
+        }
+
+        // hookup for reveal
+        if (window.Reveal) {
+          window.Reveal.addEventListener("slidechanged", function(event) {
+            fireSlideChanged(event.previousSlide, event.currentSlide);
+          });
+        }
+
+        // hookup for slidy
+        if (window.w3c_slidy) {
+          window.w3c_slidy.add_observer(function (slide_num) {
+            // slide_num starts at position 1
+            fireSlideChanged(null, w3c_slidy.slides[slide_num - 1]);
+          });
+        }
+
+      })();
+    </script>
+
     <script id="quarto-html-after-body" type="application/javascript">
     window.document.addEventListener("DOMContentLoaded", function (event) {
       const toggleBodyColorMode = (bsSheetEl) => {
