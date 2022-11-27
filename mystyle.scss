@@ -1,5 +1,5 @@
 // Include theme-specific fonts
-@import url('https://fonts.googleapis.com/css2?family=Lato&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600&display=swap');
 
 /*-- scss:defaults --*/
 // Override theme settings (see ../template/settings.scss)
@@ -10,18 +10,18 @@
 $backgroundColor: #FFFFFF;
 
 // Primary/body text
-$mainFont: 'Lato', sans-serif;
+$mainFont: 'Noto Sans', sans-serif;
 $mainFontSize: 30px;
-$mainColor: #800080;
+$mainColor: #6e7d81;
 
 // Vertical spacing between blocks of text
 $blockMargin: 20px;
 
 // Headings
 $headingMargin: 0 0 $blockMargin 0;
-$headingFont: 'Lato', Impact, sans-serif;
-$headingColor: #C2185B;
-$headingLineHeight: 1.2;
+$headingFont: 'Noto Sans', sans-serif;
+$headingColor: #79815c;
+$headingLineHeight: 1.1;
 $headingLetterSpacing: normal;
 $headingTextTransform: none;
 $headingTextShadow: none;
@@ -33,10 +33,14 @@ $heading2Size: 2.11em;
 $heading3Size: 1.55em;
 $heading4Size: 1.00em;
 
+// Code 
 $codeFont: monospace;
+$codeFontSize: 1.5em;
+$code-color: #9fa997;
+$code-block-bg: #cad7dd;
 
 // Links and actions
-$linkColor: #8BC34A;
+$linkColor: #9fa997;
 $linkColorHover: darken( $linkColor, 20% );
 
 // Text selection
@@ -44,16 +48,27 @@ $selectionBackgroundColor: #FF5E99;
 $selectionColor: #fff;
 
 // start using css here
+h1 {
+  font-family: 'Noto Sans', sans-serif;
+  color: #79815c;
+  font-size: 72px;
+  font-weight: bold;
+}
+
+// start using css here
 #title-slide > h1 {
-  color: #C2185B;
+  font-family: 'Noto Sans', sans-serif;
+  color: #79815c;
+  font-size: 72px;
+  font-weight: bold;
 }
 
 // Styling title slide
 #title-slide .author {
-  color: #800080;
+  font-family: 'Noto Sans', sans-serif;
+  color: #9fa997;
   position: relative;
-  padding-left: 600px;
-  text-align: left;
+  font-weight: medium;
 }
 
 #title-slide {
@@ -70,5 +85,5 @@ $selectionColor: #fff;
 
 // Code is too small
 #remark-code {
-  font-size: 30px;
+  font-size: 50px;
 } 
